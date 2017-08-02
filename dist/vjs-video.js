@@ -35,6 +35,7 @@
     module.controller('VjsVideoController', ['$scope', function($scope) {
         var self = this;
 
+
         function getVidElement(element, isContainer) {
             var vid = null,
                 videos;
@@ -256,29 +257,28 @@
                 // do nothing if the tech has been disposed already
 
 
-
                 //Set initial time to 0
                 var currentTime = 0;
 
 
                 myPlayer.on("seeking", function(event) {
-                    // myPlayer.currentTime(currentTime);
 
                     if (currentTime < myPlayer.currentTime()) {
                         myPlayer.currentTime(currentTime);
                     }
-                    // else if (currentTime > myPlayer.currentTime()) {
-                    //     myPlayer.currentTime(currentTime);
-                    // }
+                    else if (currentTime > myPlayer.currentTime()) {
+                        myPlayer.currentTime(currentTime);
+                    }
                 });
 
                 myPlayer.on("seeked", function(event) {
+
                     if (currentTime < myPlayer.currentTime()) {
                         myPlayer.currentTime(currentTime);
                     }
-                    // else if (currentTime > myPlayer.currentTime()) {
-                    //     myPlayer.currentTime(currentTime);
-                    // }
+                    else if (currentTime > myPlayer.currentTime()) {
+                        myPlayer.currentTime(currentTime);
+                    }
                 });
 
                 myPlayer.on("ended", function(event) {
@@ -286,12 +286,13 @@
                 });
 
                 setInterval(function() {
+
                     if (myPlayer.el()) {
-                        if (!myPlayer.paused() == false) {
+                        if (!myPlayer.paused()) {
                             currentTime = myPlayer.currentTime();
+
                         }
                     }
-
                 }, 1000);
 
                 //emit ready event with reference to video
