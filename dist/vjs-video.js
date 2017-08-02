@@ -251,12 +251,15 @@
 
                 var myPlayer = this;
 
+
+
+                // do nothing if the tech has been disposed already
+
+
+
                 //Set initial time to 0
                 var currentTime = 0;
 
-                //This example allows users to seek backwards but not forwards.
-                //To disable all seeking replace the if statements from the next
-                //two functions with myPlayer.currentTime(currentTime);
 
                 myPlayer.on("seeking", function(event) {
                     // myPlayer.currentTime(currentTime);
@@ -283,9 +286,12 @@
                 });
 
                 setInterval(function() {
-                    if (!myPlayer.paused()) {
-                        currentTime = myPlayer.currentTime();
+                    if (myPlayer.el()) {
+                        if (!myPlayer.paused() == false) {
+                            currentTime = myPlayer.currentTime();
+                        }
                     }
+
                 }, 1000);
 
                 //emit ready event with reference to video
