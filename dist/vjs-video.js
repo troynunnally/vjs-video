@@ -4,7 +4,7 @@
  * @description
  * # vjs.directive.js
  */
-(function (root, factory) {
+(function(root, factory) {
     //module loader detection derrived from http://tinyurl.com/hs2coz2
     if ((typeof define).match(/^(object|function)$/) && define.amd) {
         //AMD type module loader detected
@@ -18,21 +18,21 @@
         //also, we don't need to add this module to global space
         factory(root.angular, root.videojs);
     }
-}(this, function (angular, videojs) {
+}(this, function(angular, videojs) {
     'use strict';
 
     var module = angular.module('vjs.video', []);
 
     function getVersion() {
         return (videojs && videojs.VERSION) ?
-                videojs.VERSION : '0.0.0';
+            videojs.VERSION : '0.0.0';
     }
 
     function isMediaElement(element) {
         return element[0].nodeName === 'VIDEO' || element[0].nodeName === 'AUDIO';
     }
 
-    module.controller('VjsVideoController', ['$scope', function ($scope) {
+    module.controller('VjsVideoController', ['$scope', function($scope) {
         var self = this;
 
         function getVidElement(element, isContainer) {
@@ -66,10 +66,10 @@
         function applyRatio(el, ratioVal) {
             var ratio = ratioVal,
                 style = document.createElement('style'),
-                parseRatio = function (r) {
+                parseRatio = function(r) {
                     var tokens = r.split(':'),
                         tokenErrorMsg = 'the ratio must either be "wide", "standard" or ' +
-                                        'decimal values in the format of w:h';
+                        'decimal values in the format of w:h';
 
                     //if invalid ratio throw an error
                     if (tokens.length !== 2) {
@@ -88,7 +88,7 @@
 
                     return (Number(tokens[1]) / Number(tokens[0])) * 100;
                 },
-                genContainerId = function (element) {
+                genContainerId = function(element) {
                     var container = element[0].querySelector('.vjs-tech'),
                         vjsId;
 
@@ -114,12 +114,12 @@
             }
 
             switch (ratio) {
-            case 'wide':
-                ratio = '16:9';
-                break;
-            case 'standard':
-                ratio = '4:3';
-                break;
+                case 'wide':
+                    ratio = '16:9';
+                    break;
+                case 'standard':
+                    ratio = '4:3';
+                    break;
             }
 
             containerId = genContainerId(el);
@@ -127,8 +127,9 @@
             ratioPercentage = parseRatio(ratio);
 
             css = ['#', containerId, ' ',
-                   '.video-js {padding-top:', ratioPercentage,
-                   '%;}\n', '.vjs-fullscreen {padding-top: 0px;}'].join('');
+                '.video-js {padding-top:', ratioPercentage,
+                '%;}\n', '.vjs-fullscreen {padding-top: 0px;}'
+            ].join('');
 
             style.type = 'text/css';
             style.rel = 'stylesheet';
@@ -143,11 +144,11 @@
 
         function generateMedia(ctrl, mediaChangedHandler) {
             var errMsgNoValid = 'a sources and/or tracks element must be ' +
-                                'defined for the vjs-media attribute',
-                errMsgNoSrcs  = 'sources must be an array of objects with at ' +
-                                'least one item',
-                errMsgNoTrks  = 'tracks must be an array of objects with at ' +
-                                'least one item',
+                'defined for the vjs-media attribute',
+                errMsgNoSrcs = 'sources must be an array of objects with at ' +
+                'least one item',
+                errMsgNoTrks = 'tracks must be an array of objects with at ' +
+                'least one item',
                 div,
                 curDiv;
             //check to see if vjsMedia is defined
@@ -172,7 +173,7 @@
             div = document.createElement("div");
 
             if (ctrl.vjsMedia.sources) {
-                ctrl.vjsMedia.sources.forEach(function (curObj) {
+                ctrl.vjsMedia.sources.forEach(function(curObj) {
                     curDiv = document.createElement('source');
                     curDiv.setAttribute('src', curObj.src || "");
                     curDiv.setAttribute('type', curObj.type || "");
@@ -181,7 +182,7 @@
             }
 
             if (ctrl.vjsMedia.tracks) {
-                ctrl.vjsMedia.tracks.forEach(function (curObj) {
+                ctrl.vjsMedia.tracks.forEach(function(curObj) {
                     curDiv = document.createElement('track');
                     curDiv.setAttribute('kind', curObj.kind || "");
                     curDiv.setAttribute('label', curObj.label || "");
@@ -198,7 +199,7 @@
             }
 
             //invoke callback
-            mediaChangedHandler.call(undefined, {element: div});
+            mediaChangedHandler.call(undefined, { element: div });
 
         }
 
@@ -206,7 +207,7 @@
             var opts = params.vjsSetup || {},
                 ratio = params.vjsRatio,
                 isValidContainer =
-                    (!isMediaElement(element) && !getVersion().match(/^5\./)) ? true : false,
+                (!isMediaElement(element) && !getVersion().match(/^5\./)) ? true : false,
                 mediaWatcher;
 
             if (!videojs) {
@@ -223,10 +224,10 @@
 
             //watch for changes to vjs-media
             mediaWatcher = $scope.$watch(
-                function () {
+                function() {
                     return params.vjsMedia;
                 },
-                function (newVal, oldVal) {
+                function(newVal, oldVal) {
 
                     if (newVal && !angular.equals(newVal, oldVal)) {
                         //deregister watcher
@@ -243,10 +244,49 @@
             );
 
             //bootstrap videojs
-            videojs(vid, opts, function () {
+            videojs(vid, opts, function() {
                 if (isValidContainer) {
                     applyRatio(element, ratio);
                 }
+
+                var myPlayer = this;
+
+                //Set initial time to 0
+                var currentTime = 0;
+
+                //This example allows users to seek backwards but not forwards.
+                //To disable all seeking replace the if statements from the next
+                //two functions with myPlayer.currentTime(currentTime);
+
+                myPlayer.on("seeking", function(event) {
+                    // myPlayer.currentTime(currentTime);
+
+                    if (currentTime < myPlayer.currentTime()) {
+                        myPlayer.currentTime(currentTime);
+                    }
+                    // else if (currentTime > myPlayer.currentTime()) {
+                    //     myPlayer.currentTime(currentTime);
+                    // }
+                });
+
+                myPlayer.on("seeked", function(event) {
+                    if (currentTime < myPlayer.currentTime()) {
+                        myPlayer.currentTime(currentTime);
+                    }
+                    // else if (currentTime > myPlayer.currentTime()) {
+                    //     myPlayer.currentTime(currentTime);
+                    // }
+                });
+
+                myPlayer.on("ended", function(event) {
+                    $scope.$emit('vjsVideoEnded', {});
+                });
+
+                setInterval(function() {
+                    if (!myPlayer.paused()) {
+                        currentTime = myPlayer.currentTime();
+                    }
+                }, 1000);
 
                 //emit ready event with reference to video
                 $scope.$emit('vjsVideoReady', {
@@ -255,10 +295,11 @@
                     player: this,
                     controlBar: this.controlBar
                 });
+
             });
 
             //dispose of videojs before destroying directive
-            $scope.$on('$destroy', function () {
+            $scope.$on('$destroy', function() {
                 videojs(vid).dispose();
             });
         }
@@ -268,7 +309,7 @@
         self.getVidElement = getVidElement;
     }]);
 
-    module.directive('vjsVideo', ['$compile', '$timeout', function ($compile, $timeout) {
+    module.directive('vjsVideo', ['$compile', '$timeout', function($compile, $timeout) {
 
         return {
             restrict: 'A',
@@ -286,13 +327,13 @@
                     parentContainer,
                     origContent,
                     compiledEl,
-                    mediaChangedHandler = function (e) {
+                    mediaChangedHandler = function(e) {
                         //remove any inside contents
                         element.children().remove();
                         //add generated sources and tracks
                         element.append(e.element.childNodes);
                     },
-                    init = function () {
+                    init = function() {
                         vid = ctrl.getVidElement(element);
 
                         //check if video.js version 5.x is running
@@ -309,7 +350,7 @@
                         }
 
                         //attach transcluded content
-                        transclude(function (content) {
+                        transclude(function(content) {
                             element.append(content);
 
                             //now that the transcluded content is injected
@@ -328,13 +369,13 @@
 
                 parentContainer = element.parent();
 
-                scope.$on('vjsVideoMediaChanged', function () {
+                scope.$on('vjsVideoMediaChanged', function() {
                     //retreive base element that video.js creates
                     var staleChild = parentContainer.children()[0];
 
                     //remove current directive instance
                     //destroy will trigger a video.js dispose
-                    $timeout(function () {
+                    $timeout(function() {
                         scope.$destroy();
                     });
 
@@ -353,7 +394,7 @@
         };
     }]);
 
-    module.directive('vjsVideoContainer', [function () {
+    module.directive('vjsVideoContainer', [function() {
 
         return {
             restrict: 'AE',
@@ -370,7 +411,7 @@
             link: function postLink(scope, element, attrs, ctrl, transclude) {
                 var vid,
                     origContent,
-                    mediaChangedHandler = function (e) {
+                    mediaChangedHandler = function(e) {
                         var vidEl = element[0].querySelector('video, audio');
 
                         if (vidEl) {
@@ -385,7 +426,7 @@
                             }
                         }
                     },
-                    init = function () {
+                    init = function() {
                         vid = ctrl.getVidElement(element, true);
 
                         //we want to confirm that the vjs-video directive or
@@ -430,11 +471,11 @@
                     };
 
                 //save original content
-                transclude(function (content) {
+                transclude(function(content) {
                     origContent = content.clone();
                 });
 
-                scope.$on('vjsVideoMediaChanged', function () {
+                scope.$on('vjsVideoMediaChanged', function() {
                     //replace element children with orignal content
                     element.children().remove();
                     element.append(origContent.clone());
