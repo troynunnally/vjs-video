@@ -250,50 +250,31 @@
                     applyRatio(element, ratio);
                 }
 
-                var myPlayer = this;
+                var myPlayer = this,
+                    timePlayed = 0,
+                    video = document.getElementsByClassName('vjs-tech')[0];
 
-
-
-                // do nothing if the tech has been disposed already
-
-
-                //Set initial time to 0
-                var currentTime = 0;
-
-
-                myPlayer.on("seeking", function(event) {
-
-                    if (currentTime < myPlayer.currentTime()) {
-                        myPlayer.currentTime(currentTime);
-                    }
-                    else if (currentTime > myPlayer.currentTime()) {
-                        myPlayer.currentTime(currentTime);
-                    }
+                myPlayer.on("timeupdate", function(event) {
+                  if (!video.seeking && timePlayed < video.currentTime) timePlayed = video.currentTime;
                 });
 
-                myPlayer.on("seeked", function(event) {
-
-                    if (currentTime < myPlayer.currentTime()) {
-                        myPlayer.currentTime(currentTime);
-                    }
-                    else if (currentTime > myPlayer.currentTime()) {
-                        myPlayer.currentTime(currentTime);
-                    }
+                myPlayer.on("seeking", function(event) {
+                  if (video.currentTime > timePlayed) video.currentTime = timePlayed;
                 });
 
                 myPlayer.on("ended", function(event) {
                     $scope.$emit('vjsVideoEnded', {});
                 });
 
-                setInterval(function() {
-
-                    if (myPlayer.el()) {
-                        if (!myPlayer.paused()) {
-                            currentTime = myPlayer.currentTime();
-
-                        }
-                    }
-                }, 1000);
+                // setInterval(function() {
+                //
+                //     if (myPlayer.el()) {
+                //         if (!myPlayer.paused()) {
+                //             currentTime = video.currentTime;
+                //
+                //         }
+                //     }
+                // }, 1000);
 
                 //emit ready event with reference to video
                 $scope.$emit('vjsVideoReady', {
