@@ -255,26 +255,27 @@
                     video = document.getElementsByClassName('vjs-tech')[0];
 
                 myPlayer.on("timeupdate", function(event) {
-                  if (!video.seeking && timePlayed < video.currentTime) timePlayed = video.currentTime;
+                    if (!video.seeking && timePlayed < video.currentTime) {
+                        timePlayed = video.currentTime;
+                        localStorage.setItem("lessonTime", timePlayed);
+                    }
                 });
 
                 myPlayer.on("seeking", function(event) {
-                  if (video.currentTime > timePlayed) video.currentTime = timePlayed;
+                    if (video.currentTime > timePlayed) {
+                    video.currentTime = timePlayed;
+                     localStorage.setItem("lessonTime", timePlayed);
+                    }
                 });
+
+                if (params.vjsMedia.sources[0].start) {
+                    console.log(params.vjsMedia.sources[0].start);
+                    video.currentTime = params.vjsMedia.sources[0].start || 0;
+                }
 
                 myPlayer.on("ended", function(event) {
                     $scope.$emit('vjsVideoEnded', {});
                 });
-
-                // setInterval(function() {
-                //
-                //     if (myPlayer.el()) {
-                //         if (!myPlayer.paused()) {
-                //             currentTime = video.currentTime;
-                //
-                //         }
-                //     }
-                // }, 1000);
 
                 //emit ready event with reference to video
                 $scope.$emit('vjsVideoReady', {
