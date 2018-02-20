@@ -215,6 +215,8 @@
                 return null;
             }
 
+
+
             //override poster settings if defined in vjsMedia
             if (params.vjsMedia && params.vjsMedia.poster) {
                 opts.poster = params.vjsMedia.poster;
@@ -244,6 +246,11 @@
                 }
             );
 
+            //If no file exist, exit before initializing videojs
+            if (params.vjsMedia.sources[0].src === '') {
+                return;
+            }
+
             //bootstrap videojs
             videojs(vid, opts, function() {
                 if (isValidContainer) {
@@ -256,7 +263,7 @@
 
                 //Init current time based-on local storage
                 if (params.vjsMedia.sources[0].start) {
-                    console.log(params.vjsMedia.sources[0].start);
+//                  console.log(params.vjsMedia.sources[0].start);
                     video.currentTime = params.vjsMedia.sources[0].start || 0;
                     timePlayed = video.currentTime;
                 }
@@ -269,7 +276,7 @@
                 });
 
                 myPlayer.on("seeking", function(event) {
-                    if (video.currentTime > timePlayed) {
+                    if (video.currentTime > timePlayed && !params.vjsMedia.sources[0].fastForward) {
                         video.currentTime = timePlayed;
                     }
                 });
