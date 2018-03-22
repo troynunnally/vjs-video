@@ -263,7 +263,7 @@
 
                 //Init current time based-on local storage
                 if (params.vjsMedia.sources[0].start) {
-//                  console.log(params.vjsMedia.sources[0].start);
+                    //                  console.log(params.vjsMedia.sources[0].start);
                     video.currentTime = params.vjsMedia.sources[0].start || 0;
                     timePlayed = video.currentTime;
                 }
@@ -272,6 +272,11 @@
                     if (!video.seeking && timePlayed < video.currentTime) {
                         timePlayed = video.currentTime;
                         localStorage.setItem("lessonTime", timePlayed);
+                    }
+
+                    if (!video.seeking && params.vjsMedia.sources[0].isRemediation && video.currentTime > params.vjsMedia.sources[0].end ) {
+                        video.pause();
+                        $scope.$emit('vjsVideoRemediationStopped', {});
                     }
                 });
 
