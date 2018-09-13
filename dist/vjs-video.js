@@ -252,7 +252,7 @@
             }
 
             //bootstrap videojs
-            videojs(vid, opts, function() {
+            var player = videojs(vid, opts, function() {
                 if (isValidContainer) {
                     applyRatio(element, ratio);
                 }
@@ -268,13 +268,14 @@
                     timePlayed = video.currentTime;
                 }
 
+
                 myPlayer.on("timeupdate", function(event) {
                     if (!video.seeking && timePlayed < video.currentTime) {
                         timePlayed = video.currentTime;
                         localStorage.setItem("lessonTime", timePlayed);
                     }
 
-                    if (!video.seeking && params.vjsMedia.sources[0].isRemediation && video.currentTime > params.vjsMedia.sources[0].end ) {
+                    if (!video.seeking && params.vjsMedia.sources[0].isRemediation && video.currentTime > params.vjsMedia.sources[0].end) {
                         video.pause();
                         $scope.$emit('vjsVideoRemediationStopped', {});
                     }
@@ -290,6 +291,9 @@
                     $scope.$emit('vjsVideoEnded', {});
                 });
 
+                //Check for overlay
+                myPlayer.overlay(params.vjsMedia.sources[0].overlayLinks);
+
                 //emit ready event with reference to video
                 $scope.$emit('vjsVideoReady', {
                     id: vid.getAttribute('id'),
@@ -299,6 +303,10 @@
                 });
 
             });
+
+
+
+
 
             //dispose of videojs before destroying directive
             $scope.$on('$destroy', function() {
